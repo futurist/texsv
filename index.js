@@ -37,10 +37,22 @@ var apiReqHandler = Front.apiRequest.bind(Front);
 
 // Enable CORS. Note: if you copy this code into production, you may want to
 // disable this. See https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
-app.use(function(req, res, next) {
-  res.set('Access-Control-Allow-Origin', '*');
-  next();
-})
+// http://stackoverflow.com/questions/11001817/allow-cors-rest-request-to-a-express-node-js-application-on-heroku
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+    // intercept OPTIONS method
+    if ('OPTIONS' == req.method) {
+      res.send(200);
+    }
+    else {
+      next();
+    }
+};
+
+app.use(allowCrossDomain)
 
 // Now, add the routes.
 // To do this in a more scalable and configurable way, check out
@@ -59,5 +71,5 @@ app.use(function(req, res, next) {
 });
 
 // And we're done! Start 'er up!
-console.log('Starting up! Visit 127.0.0.1:3000 to see the docs.');
-app.listen(4000);
+console.log('Starting up! Visit '+ common.host +' to see the docs.');
+app.listen( common.port );
