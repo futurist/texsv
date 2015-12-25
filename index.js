@@ -58,7 +58,10 @@ app.use(allowCrossDomain)
 // To do this in a more scalable and configurable way, check out
 // http://github.com/ethanresnick/express-simple-router. To protect some
 // routes, check out http://github.com/ethanresnick/express-simple-firewall.
-app.get("/", Front.docsRequest.bind(Front));
+app.get("/", function(req,res){ res.end() });
+// app.get("/", Front.docsRequest.bind(Front));
+
+
 app.route("/:type(person|formtype)")
   .get(apiReqHandler).post(apiReqHandler).patch(apiReqHandler);
 app.route("/:type(person|formtype)/:id")
