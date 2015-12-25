@@ -2,7 +2,7 @@
 var mongoose = require('mongoose')
 
 var port = 4000;
-var host = 'http://1111hui.com:'+port;
+var host = 'http://1111hui.com/json-api';
 var dbName = 'test2'
 
 // http://stackoverflow.com/questions/10873199/how-to-handle-mongoose-db-connection-interruptions

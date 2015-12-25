@@ -28,7 +28,7 @@ var Controller = new API.controllers.API(registry);
 
 // Initialize the automatic documentation.
 var Docs = new API.controllers.Documentation(registry, {name: 'JSON API'});
-console.log(Docs)
+
 // Initialize the express app + front controller.
 var app = express();
 
@@ -40,7 +40,7 @@ var apiReqHandler = Front.apiRequest.bind(Front);
 // http://stackoverflow.com/questions/11001817/allow-cors-rest-request-to-a-express-node-js-application-on-heroku
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
 
     // intercept OPTIONS method
@@ -74,5 +74,5 @@ app.use(function(req, res, next) {
 });
 
 // And we're done! Start 'er up!
-console.log('Starting up! Visit '+ common.host +' to see the docs.', app);
+console.log('Starting up! Visit '+ common.host +' to see the docs.');
 app.listen( common.port );

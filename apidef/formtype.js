@@ -1,5 +1,5 @@
 var common = require('../common')
-
+console.log(common.host)
 module.exports = {
   urlTemplates: {
     "self": common.host + "/formtype/{id}",
