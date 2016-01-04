@@ -1,0 +1,17 @@
+{
+  "name": "texsv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jsonapi-server": "^1.0.3"
+  }
+}
