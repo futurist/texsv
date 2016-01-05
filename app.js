@@ -20,6 +20,24 @@ var handler = new MongoStore({
 	url: "mongodb://localhost:27017/test2",
 }, api);
 
+handler.on_initialise = function(resName, col) {
+  // console.log('init ready', resName)
+  handler._col = handler._col||{}
+  handler._col[resName] = col;
+  if(resName=='formtype'){
+    col.find({}, {sort:{createAt:1} }).toArray(function(err, docs){
+      docs.forEach(function(result){
+        handler._db
+        .collection('formtype_archive')
+        .count( { 'value.id':result.id }, function(err, maxCount){
+          // console.log('create', result.name, result.id, maxCount)
+          typeInfo.createType(handler, maxCount||0, 'userform_'+ result.name, result.template )
+        })
+      })
+    })
+  }
+}
+
 handler.on_create = function(err, result){
   console.log('on_create', err, result)
   if(result.type=='formtype'){
@@ -39,11 +57,11 @@ handler.on_update = function(err, oldData, newData){
   		console.log('maxCount', err, maxCount)
 	   var archiveData = {
 	  		data:{
-	  			type:'formtype_archive', 
+	  			type:'formtype_archive',
 		  		attributes:{
-		  			name:oldData.name, 
+		  			name:oldData.name,
 		  			version: maxCount,
-		  			operateBy:{type:'person', id:'19082b98-70ab-4d2a-8155-b3329e0296c6'}, 
+		  			operateBy:{type:'person', id:'19082b98-70ab-4d2a-8155-b3329e0296c6'},
 		  			value:oldData,
 		  			live_version: { type:'formtype', id:newData.id }
 		  		}
@@ -54,7 +72,7 @@ handler.on_update = function(err, oldData, newData){
 			console.log(err, status)
 			typeInfo.createType( handler, maxCount+1, 'userform_'+ newData.name, newData.template )
 		})
-		
+
 		// below native mongo code will not generate UUID, so we use api version
 		// archiveData.data.attributes.type = archiveData.data.type;
 		// col.insertOne( archiveData.data.attributes, function(err, result){

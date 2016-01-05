@@ -73,9 +73,8 @@ typeInfo.createType = function createType(handlers, version, typeName, template)
   for(var i in template) {
     attributes[ i ] = _getTypeInfo( template[i] );
   }
-  attributes.__v = api.Joi.number().meta(version||0)
+  attributes.__v = api.Joi.number().default(version||0)
   var schema = {resource: typeName, handlers:handlers, attributes:attributes }
-  console.log(schema)
   api.define( schema )
 }
 
