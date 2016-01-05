@@ -37,3 +37,13 @@ setTimeout(function  () {
 	});
 }, 10000)
 
+var s = {
+	    title: jsonApi.Joi.string().meta( function(){return 'sodijf'} ),
+	    url: jsonApi.Joi.string().uri(),
+	    height: jsonApi.Joi.number().min(1).max(10000).precision(0),
+	    width: jsonApi.Joi.number().min(1).max(10000).precision(0)
+	  }
+for(var i in s){
+	console.log(i, s[i]._meta.pop() )
+}
+
