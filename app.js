@@ -2,6 +2,7 @@ var util = require("util");
 var api = require("jsonapi-server");
 var MongoStore = require("jsonapi-store-mongodb");
 var typeInfo = require('./typeInfo');
+var debug = require('./debug')
 
 var API_HOST = 'http://1111hui.com'
 var API_BASE = '/json-api'
@@ -21,7 +22,7 @@ var handler = new MongoStore({
 }, api);
 
 handler.on_initialise = function(resName, col) {
-  // console.log('init ready', resName)
+  debug.db('init', resName)
   handler._col = handler._col||{}
   handler._col[resName] = col;
   if(resName=='formtype'){
@@ -30,7 +31,7 @@ handler.on_initialise = function(resName, col) {
         handler._db
         .collection('formtype_archive')
         .count( { 'value.id':result.id }, function(err, maxCount){
-          // console.log('create', result.name, result.id, maxCount)
+          debug.db('create', result.name, result.id, maxCount)
           typeInfo.createType(handler, maxCount||0, 'userform_'+ result.name, result.template )
         })
       })
@@ -39,22 +40,22 @@ handler.on_initialise = function(resName, col) {
 }
 
 handler.on_create = function(err, result){
-  console.log('on_create', err, result)
+  debug.db('on_create', err, result)
   if(result.type=='formtype'){
     typeInfo.createType(handler, 0, 'userform_'+ result.name, result.template )
   }
 }
 handler.on_delete = function(err, result, type, id) {
-  console.log('on_delete', err, result.result )
+  debug.db('on_delete', err, result.result )
 }
 handler.on_update = function(err, oldData, newData){
-  console.log('on_update', err, oldData.name, newData.name)
+  debug.db('on_update', err, oldData.name, newData.name)
 
   if(newData.type=='formtype') {
 
   	var col = handler._db.collection('formtype_archive')
   	col.count( { 'value.id':oldData.id }, function(err, maxCount){
-  		console.log('maxCount', err, maxCount)
+  		debug.db('maxCount', err, maxCount)
 	   var archiveData = {
 	  		data:{
 	  			type:'formtype_archive',
@@ -69,7 +70,7 @@ handler.on_update = function(err, oldData, newData){
 	  	}
 
 		typeInfo.request('POST', API_BASE+'/formtype_archive', archiveData, function(err, status, header, body){
-			console.log(err, status)
+			debug.db(err, status)
 			typeInfo.createType( handler, maxCount+1, 'userform_'+ newData.name, newData.template )
 		})
 
@@ -138,6 +139,6 @@ api.define({
 
 api.start();
 
-console.log('api started at ', BasePath, 'port', api._apiConfig.port  )
+debug.app('api started at ', BasePath, 'port', api._apiConfig.port  )
 
 

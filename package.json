@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "debug": "^2.2.0",
     "isemail": "^2.1.0",
     "jsonapi-server": "^1.0.3",
     "moment": "^2.11.0",
