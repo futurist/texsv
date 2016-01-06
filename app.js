@@ -41,12 +41,20 @@ handler.on_initialise = function(resName, col) {
 
 
 handler.before_create = function(type, document){
+	debug.db('before_create')
 	return new Promise(function(resolve, reject){
-		resolve()
+		if(type=='formtype'){
+			handler._db.collection(type).count({name:document.name}, function(err, count){
+				if(count) reject("命名重复，无法创建，请改一下名称")
+				else resolve()
+			})
+		}else{
+			resolve()
+		}
 	})
 }
 handler.after_create = function(err, result, nextCallback){
-  debug.db('on_create', err, result)
+  debug.db('after_create', err, result)
   if(result.type=='formtype'){
     typeInfo.createType(handler, 0, 'userform_'+ result.name, result.template )
   }
@@ -57,7 +65,7 @@ handler.after_create = function(err, result, nextCallback){
 handler.before_delete = function(type, id) {
 }
 handler.after_delete = function(err, result, type, id, nextCallback) {
-  debug.db('on_delete', err, result.result )
+  debug.db('after_delete', err, result.result )
   nextCallback && nextCallback()
 }
 
