@@ -1,5 +1,6 @@
 
 var http = require('http')
+var debug = require('./debug')
 
 var typeInfo = module.exports = {}
 
@@ -8,8 +9,10 @@ function _getTypeInfo(dom){
   var info
   if( /input/i.test(dom.tag) && dom.attrs.type == "number" ){
     info = api.Joi.number();
+  } else if( /span/i.test(dom.tag) ) {
+    info = api.Joi.array();
   } else {
-    info = api.Joi.string();
+  	info = api.Joi.string();
   }
   if(dom.attrs.required){
     info = info.required()
@@ -40,8 +43,8 @@ typeInfo.request = function request(method, path, data, callback) {
       var status = res.statusCode
       var headers = res.headers
       var body = '';
-      console.log('STATUS: ' + status);
-      console.log('HEADERS: ' + JSON.stringify(headers));
+      debug.type('STATUS', status);
+      debug.type('HEADERS', JSON.stringify(headers));
 
       // skip body, just return status code for fast speed!!!
       return callback&&callback(null, status, headers, body )

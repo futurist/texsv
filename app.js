@@ -30,7 +30,7 @@ handler.on_initialise = function(resName, col) {
       docs.forEach(function(result){
         handler._db
         .collection('formtype_archive')
-        .count( { 'value.id':result.id }, function(err, maxCount){
+        .count( { 'live_version.id':result.id }, function(err, maxCount){
           debug.db('create', result.name, result.id, maxCount)
           typeInfo.createType(handler, maxCount||0, 'userform_'+ result.name, result.template )
         })
@@ -39,23 +39,49 @@ handler.on_initialise = function(resName, col) {
   }
 }
 
-handler.on_create = function(err, result){
+
+handler.before_create = function(type, document){
+	return new Promise(function(resolve, reject){
+		resolve()
+	})
+}
+handler.after_create = function(err, result, nextCallback){
   debug.db('on_create', err, result)
   if(result.type=='formtype'){
     typeInfo.createType(handler, 0, 'userform_'+ result.name, result.template )
   }
+  nextCallback && nextCallback()
 }
-handler.on_delete = function(err, result, type, id) {
+
+
+handler.before_delete = function(type, id) {
+}
+handler.after_delete = function(err, result, type, id, nextCallback) {
   debug.db('on_delete', err, result.result )
+  nextCallback && nextCallback()
 }
-handler.on_update = function(err, oldData, newData){
-  debug.db('on_update', err, oldData.name, newData.name)
+
+
+handler.before_update = function(type, id, newData, it){
+	// must return Promise
+	return new Promise(function(resolve, reject){
+	      resolve();
+	})
+}
+handler.after_update = function(err, oldData, newData, nextCallback ){
+  debug.db('after_update', err, oldData.name, newData.name)
 
   if(newData.type=='formtype') {
 
   	var col = handler._db.collection('formtype_archive')
-  	col.count( { 'value.id':oldData.id }, function(err, maxCount){
+  	col.count( { 'live_version.id':oldData.id }, function(err, maxCount){
   		debug.db('maxCount', err, maxCount)
+
+  		// pass to next callback
+	  	newData.version = maxCount+1
+	  	handler._db.collection('formtype').updateOne({id:newData.id}, {$set:{version: maxCount+1}} );
+	  	nextCallback && nextCallback()
+
 	   var archiveData = {
 	  		data:{
 	  			type:'formtype_archive',
@@ -68,6 +94,7 @@ handler.on_update = function(err, oldData, newData){
 		  		}
 	  		}
 	  	}
+
 
 		typeInfo.request('POST', API_BASE+'/formtype_archive', archiveData, function(err, status, header, body){
 			debug.db(err, status)
@@ -131,6 +158,7 @@ api.define({
     updateBy: api.Joi.one('person'),
     template: api.Joi.any().allow([null,'']),
     dom: api.Joi.any().allow([null,'']),
+    version: api.Joi.number().default(0),
     // get all archive url is: /formtype_archive/?filter[live_version]=144d4f50-d650-4a54-81b3-045a424307dd
     formtype_archive: api.Joi.belongsToMany({ resource:'formtype_archive', as:'live_version' })
   }
