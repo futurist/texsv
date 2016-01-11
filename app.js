@@ -6,7 +6,7 @@ var typeInfo = require('./typeInfo');
 var debug = require('./debug')
 
 var API_BASE = '/json-api'
-var MONGODB_URL = "mongodb://localhost:27017/test2"
+var MONGODB_URL = "mongodb://localhost:27017/test3"
 
 api.setConfig({
 	protocol: 'http',
@@ -35,7 +35,7 @@ handler.on_initialise = function(resName, col) {
         .collection('formtype_archive')
         .count( { 'live_version.id':result.id }, function(err, maxCount){
           debug.db('create', result.name, result.id, maxCount)
-          typeInfo.createType(handler, maxCount||0, 'userform_'+ result.name, result.template )
+          typeInfo.createType(handler, maxCount||0, 'form_'+ result.name, result.template )
         })
       })
     })
@@ -59,7 +59,7 @@ handler.before_create = function(type, document){
 handler.after_create = function(err, result, nextCallback){
   debug.db('after_create', err, result)
   if(result.type=='formtype'){
-    typeInfo.createType(handler, 0, 'userform_'+ result.name, result.template )
+    typeInfo.createType(handler, 0, 'form_'+ result.name, result.template )
   }
   nextCallback && nextCallback()
 }
@@ -113,7 +113,7 @@ handler.after_update = function(err, oldData, newData, nextCallback ){
 
 		typeInfo.request('POST', API_BASE+'/formtype_archive', archiveData, function(err, status, header, body){
 			debug.db(err, status)
-			typeInfo.createType( handler, maxCount+1, 'userform_'+ newData.name, newData.template )
+			typeInfo.createType( handler, maxCount+1, 'form_'+ newData.name, newData.template )
 		})
 
 		// below native mongo code will not generate UUID, so we use api version
