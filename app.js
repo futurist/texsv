@@ -1,15 +1,16 @@
 var util = require("util");
+var mongoose = require("mongoose");
 var api = require("jsonapi-server");
 var MongoStore = require("jsonapi-store-mongodb");
 var typeInfo = require('./typeInfo');
 var debug = require('./debug')
 
-var API_HOST = 'http://1111hui.com'
 var API_BASE = '/json-api'
+var MONGODB_URL = "mongodb://localhost:27017/test2"
 
 api.setConfig({
-	// protocol: 'http',
-	// hostname: '1111hui.com',
+	protocol: 'http',
+	hostname: '127.0.0.1',
 	port: 4000,
 	base: API_BASE
 });
@@ -17,8 +18,10 @@ api.setConfig({
 typeInfo.setApi(api);
 var BasePath = api._apiConfig.pathPrefix;
 
+mongoose.connect(MONGODB_URL);
+
 var handler = new MongoStore({
-	url: "mongodb://localhost:27017/test2",
+	url: MONGODB_URL,
 }, api);
 
 handler.on_initialise = function(resName, col) {
@@ -45,7 +48,7 @@ handler.before_create = function(type, document){
 	return new Promise(function(resolve, reject){
 		if(type=='formtype'){
 			handler._db.collection(type).count({name:document.name}, function(err, count){
-				if(count) reject("命名重复，无法创建，请改一下名称")
+				if(count) reject("创建失败：命名重复，请改一下名称")
 				else resolve()
 			})
 		}else{
@@ -63,6 +66,10 @@ handler.after_create = function(err, result, nextCallback){
 
 
 handler.before_delete = function(type, id) {
+	debug.db('before_create')
+	return new Promise(function(resolve, reject){
+		resolve()
+	})
 }
 handler.after_delete = function(err, result, type, id, nextCallback) {
   debug.db('after_delete', err, result.result )

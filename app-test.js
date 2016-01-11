@@ -1,5 +1,13 @@
 var jsonApi = require("jsonapi-server");
 var MongoStore = require("jsonapi-store-mongodb");
+var Joi = require('joi')
+
+var testdate = Joi.date().format('YYYY-MM-DD')
+Joi.validate('2017-06-29', testdate, function(err, result){
+	console.log( err, result )
+})
+
+
 
 jsonApi.setConfig({
 	port: 4000,

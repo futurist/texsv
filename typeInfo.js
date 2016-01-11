@@ -1,7 +1,9 @@
 
 var http = require('http')
+var mongoose = require('mongoose')
 var debug = require('./debug')
 
+var Schema = mongoose.Schema
 var typeInfo = module.exports = {}
 
 var api = {}
@@ -11,6 +13,23 @@ function _getTypeInfo(dom){
     info = api.Joi.number();
   } else if( /span/i.test(dom.tag) ) {
     info = api.Joi.array();
+  } else {
+    info = api.Joi.string();
+  }
+  if(dom.attrs.required){
+    info = info.required()
+  }else{
+    info = info.allow([null,''])
+  }
+  return info;
+}
+
+function _getMonGooseTypeSchema(dom){
+  var info
+  if( /input/i.test(dom.tag) && dom.attrs.type == "number" ){
+    info = {type:String };
+  } else if( /span/i.test(dom.tag) ) {
+    info = {type:Array };
   } else {
   	info = api.Joi.string();
   }
@@ -76,9 +95,14 @@ typeInfo.createType = function createType(handlers, version, typeName, template)
   for(var i in template) {
     attributes[ i ] = _getTypeInfo( template[i] );
   }
-  attributes.__v = api.Joi.number().default(version||0)
+  attributes.meta_form = api.Joi.one('formtype')
+  attributes.meta_ver = api.Joi.number().default(version||0)
   var schema = {resource: typeName, handlers:handlers, attributes:attributes }
+  //  here should comment JSONAPI-SERVER's validation
   api.define( schema )
+
+  // mongoose def
+  // mongoose.model(typeName, new Schema({ name: String }), typeName);
 }
 
 

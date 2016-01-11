@@ -7,6 +7,7 @@
     "node": "*"
   },
   "scripts": {
+    "node-debug": "node-debug -p 81 --web-host 0.0.0.0 -d 8080 app.js",
     "start": "node app.js"
   },
   "author": "",
@@ -18,6 +19,7 @@
     "isemail": "^2.1.0",
     "jsonapi-server": "^1.0.3",
     "moment": "^2.11.0",
+    "mongoose": "^4.3.4",
     "request": "^2.67.0"
   }
 }
