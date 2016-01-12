@@ -1,5 +1,4 @@
 var util = require("util");
-var mongoose = require("mongoose");
 var api = require("jsonapi-server");
 var MongoStore = require("jsonapi-store-mongodb");
 var typeInfo = require('./typeInfo');
@@ -17,8 +16,6 @@ api.setConfig({
 
 typeInfo.setApi(api);
 var BasePath = api._apiConfig.pathPrefix;
-
-mongoose.connect(MONGODB_URL);
 
 var handler = new MongoStore({
 	url: MONGODB_URL,
