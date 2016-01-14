@@ -120,8 +120,9 @@ handler.after_update = function(err, oldData, newData, nextCallback ){
 		// } )
 
 	})
-
+  return
   }
+  nextCallback()
 }
 
 
